@@ -1,0 +1,153 @@
+# 시뮬레이션에서 RL 학습하기
+
+이 가이드는 LeRobot의 Human-In-the-Loop(HIL) 강화학습을 사용할 때 실제 로봇 대신 `gym_hil` 시뮬레이션 환경을 활용하는 방법을 설명합니다.
+
+`gym_hil`은 HIL 강화학습을 위해 설계된 Gymnasium 호환 시뮬레이션 환경 패키지입니다. 이를 통해 다음을 할 수 있습니다:
+
+- 실제 로봇 학습 전에 시뮬레이션에서 정책을 학습해 RL 스택을 검증
+- 게임패드/키보드 등 외부 장치로 시뮬레이션 데모 수집
+- 정책 학습 중 인간 개입 수행
+
+현재 주요 환경은 MuJoCo 기반 Franka Panda 로봇 시뮬레이션이며, 큐브 집기 등의 태스크가 포함됩니다.
+
+## 설치
+
+LeRobot 환경에서 `gym_hil` 패키지를 설치합니다:
+
+```bash
+pip install -e ".[hilserl]"
+```
+
+## 준비물
+
+- 게임패드 또는 키보드
+- Nvidia GPU
+
+## 설정
+
+LeRobot에서 `gym_hil`을 사용하려면 설정 파일을 만들어야 합니다. 예시는 [여기](https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/gym_hil/env_config.json)에 있습니다. 주요 섹션은 다음과 같습니다.
+
+### 환경 타입과 태스크
+
+```json
+{
+  "env": {
+    "type": "gym_manipulator",
+    "name": "gym_hil",
+    "task": "PandaPickCubeGamepad-v0",
+    "fps": 10
+  },
+  "device": "cuda"
+}
+```
+
+사용 가능한 태스크:
+
+- `PandaPickCubeBase-v0`: 기본 환경
+- `PandaPickCubeGamepad-v0`: 게임패드 제어 포함
+- `PandaPickCubeKeyboard-v0`: 키보드 제어 포함
+
+### 프로세서 설정
+
+```json
+{
+  "env": {
+    "processor": {
+      "control_mode": "gamepad",
+      "gripper": {
+        "use_gripper": true,
+        "gripper_penalty": -0.02
+      },
+      "reset": {
+        "control_time_s": 15.0,
+        "fixed_reset_joint_positions": [
+          0.0, 0.195, 0.0, -2.43, 0.0, 2.62, 0.785
+        ]
+      },
+      "inverse_kinematics": {
+        "end_effector_step_sizes": {
+          "x": 0.025,
+          "y": 0.025,
+          "z": 0.025
+        }
+      }
+    }
+  }
+}
+```
+
+중요 파라미터:
+
+- `gripper.gripper_penalty`: 그리퍼 과도 움직임 패널티
+- `gripper.use_gripper`: 그리퍼 제어 사용 여부
+- `inverse_kinematics.end_effector_step_sizes`: EE x,y,z 스텝 크기
+- `control_mode`: 게임패드를 쓰려면 `"gamepad"`
+
+## LeRobot의 HIL RL로 실행하기
+
+### 기본 실행
+
+모드를 null로 두고 실행합니다:
+
+```bash
+python -m lerobot.rl.gym_manipulator --config_path path/to/gym_hil_env.json
+```
+
+### 데이터셋 기록
+
+데이터셋을 수집하려면 모드를 `record`로 설정하고 `repo_id`, 에피소드 수를 지정합니다:
+
+```json
+{
+  "env": {
+    "type": "gym_manipulator",
+    "name": "gym_hil",
+    "task": "PandaPickCubeGamepad-v0"
+  },
+  "dataset": {
+    "repo_id": "username/sim_dataset",
+    "root": null,
+    "task": "pick_cube",
+    "num_episodes_to_record": 10,
+    "replay_episode": null,
+    "push_to_hub": true
+  },
+  "mode": "record"
+}
+```
+
+```bash
+python -m lerobot.rl.gym_manipulator --config_path path/to/gym_hil_env.json
+```
+
+### 정책 학습
+
+정책을 학습하려면 [여기](https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/gym_hil/train_config.json)의 설정 예시를 참고하고 actor/learner 서버를 실행합니다:
+
+```bash
+python -m lerobot.rl.actor --config_path path/to/train_gym_hil_env.json
+```
+
+다른 터미널에서 learner 서버를 실행합니다:
+
+```bash
+python -m lerobot.rl.learner --config_path path/to/train_gym_hil_env.json
+```
+
+시뮬레이션 환경은 실제 로봇에 배포하기 전에 HIL RL 구성요소를 안전하고 반복 가능하게 테스트할 수 있는 방법을 제공합니다.
+
+축하합니다 🎉 튜토리얼을 완료했습니다!
+
+> [!TIP]
+> 질문이 있으면 [Discord](https://discord.com/invite/s3KuuzsPFb)에서 도움을 받으세요.
+
+논문 인용:
+
+```
+@article{luo2024precise,
+  title={Precise and Dexterous Robotic Manipulation via Human-in-the-Loop Reinforcement Learning},
+  author={Luo, Jianlan and Xu, Charles and Wu, Jeffrey and Levine, Sergey},
+  journal={arXiv preprint arXiv:2410.21845},
+  year={2024}
+}
+```
