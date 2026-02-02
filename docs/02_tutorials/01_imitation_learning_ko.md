@@ -338,6 +338,7 @@ robot.disconnect()
 ```bash
 lerobot-train \
   --dataset.repo_id=${HF_USER}/so101_test \
+  --dataset.video_backend=pyav \
   --policy.type=act \
   --output_dir=outputs/train/act_so101_test \
   --job_name=act_so101_test \
@@ -354,6 +355,33 @@ lerobot-train \
 4. 학습 플롯 시각화를 위해 [Weights and Biases](https://docs.wandb.ai/quickstart)를 사용하려고 `wandb.enable=true`를 제공했습니다. 이는 선택사항이며, 사용하려면 `wandb login`으로 로그인해야 합니다.
 
 학습은 몇 시간 걸릴 수 있습니다. 체크포인트는 `outputs/train/act_so101_test/checkpoints`에서 찾을 수 있습니다.
+
+### 자주 쓰는 추가 옵션
+
+- **로컬 데이터셋 경로 지정**: 허브 업로드 없이 로컬에 저장된 데이터셋을 학습할 때 사용합니다.
+  - 예: `--dataset.root=./outputs/datasets/my-first-lerobot-test`
+- **비디오 디코더 변경**: `torchcodec` 관련 오류가 나는 경우 `pyav`로 전환할 수 있습니다.
+  - 예: `--dataset.video_backend=pyav`
+- **이미지 변형(증강) 활성화**: 조명/각도 변화에 강하게 만들기 위해 학습 입력 이미지에 랜덤 변형을 적용합니다.
+  - 켜기: `--dataset.image_transforms.enable=true`
+  - 기본 구성에는 회전/이동(`RandomAffine`), 색상/밝기(`ColorJitter`), 선명도(`SharpnessJitter`)가 포함되며,
+    한 번에 최대 3개까지 랜덤 적용됩니다.
+
+예시:
+
+```bash
+lerobot-train \
+  --dataset.repo_id=${HF_USER}/so101_test \
+  --dataset.root=./outputs/datasets/so101_test \
+  --dataset.video_backend=pyav \
+  --dataset.image_transforms.enable=true \
+  --policy.type=act \
+  --output_dir=outputs/train/act_so101_test \
+  --job_name=act_so101_test \
+  --policy.device=cuda \
+  --wandb.enable=false \
+  --policy.push_to_hub=false
+```
 
 체크포인트에서 학습을 재개하려면, 아래는 `act_so101_test` 정책의 `last` 체크포인트에서 재개하는 예시 명령입니다:
 
