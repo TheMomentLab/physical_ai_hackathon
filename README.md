@@ -35,7 +35,7 @@
 ### 👥 팀원 (Contributors)
 
 <p align="center">
-  <img src="https://github.com/TheMomentLab/.github/blob/main/1770642885261.jpg?raw=true" width="50%">
+  <img src="https://github.com/TheMomentLab/.github/blob/main/1770642885261.jpg?raw=true" width="30%">
 </p>
 
 | 이름 (Name) | 역할 (Role) | GitHub |
