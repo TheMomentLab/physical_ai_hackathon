@@ -34,6 +34,10 @@
 
 ### 👥 팀원 (Contributors)
 
+<p align="center">
+  <img src="https://github.com/TheMomentLab/.github/blob/main/1770642885261.jpg?raw=true" width="50%">
+</p>
+
 | 이름 (Name) | 역할 (Role) | GitHub |
 |:---:|:---:|:---:|
 | **장진혁** | Team Leader | [@jinhyuk2me](https://github.com/jinhyuk2me) |
