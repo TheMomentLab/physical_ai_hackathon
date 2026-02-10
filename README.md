@@ -40,7 +40,7 @@
 
 | 이름 (Name) | 역할 (Role) | GitHub |
 |:---:|:---:|:---:|
-| **장진혁** | Team Leader | [@jinhyuk2me](https://github.com/jinhyuk2me) |
 | **김종명** | Member | [@jongbob1918](https://github.com/jongbob1918) |
-| **최원호** | Member | [@wonho9188](https://github.com/wonho9188) |
+| **장진혁** | Team Leader | [@jinhyuk2me](https://github.com/jinhyuk2me) |
 | **김재형** | Member | [@Fullmoon34213](https://github.com/Fullmoon34213) |
+| **최원호** | Member | [@wonho9188](https://github.com/wonho9188) |
